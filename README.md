@@ -6,7 +6,7 @@ Anonymous prediction markets denominated in Monero. Users deposit XMR, take posi
 
 Reference implementation of a Tor-native Monero-denominated prediction-market runtime. Single-federation, `darks`-backed multisig, Phoenix + LiveView, WAL-backed state with leader/follower replication.
 
-Source: [github.com/sovereign-maxi/perpwalk](https://github.com/sovereign-maxi/perpwalk).
+Protocol specification: [github.com/sovereign-maxi/perpwalk-docs](https://github.com/sovereign-maxi/perpwalk-docs).
 
 ## Architecture
 
