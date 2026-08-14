@@ -1,0 +1,50 @@
+<PerpWalkWeb.Live.Helpers.app_header current_handle={@current_handle} />
+
+<PerpWalkWeb.Live.Helpers.app_sub_nav current_handle={@current_handle} />
+
+<main class="bp-root">
+  <h1 class="bp-sr-only">{Messages.auth_login_sr_heading()}</h1>
+  <div class="bp-page bp-page-narrow">
+    <div class="bp-box">
+      <div class="bp-panel-header">
+        <h2 class="bp-panel-title">{Messages.auth_login_panel_title()}</h2>
+      </div>
+      <div class="bp-panel-body bp-stack">
+        <form method="post" action={~p"/auth/login"}>
+          <input
+            type="hidden"
+            name="_csrf_token"
+            value={Phoenix.Controller.get_csrf_token()}
+          />
+
+          <div class="bp-input-row">
+            <label for="auth-keyphrase" class="bp-sr-only">{Messages.auth_keyphrase_label()}</label>
+            <input
+              id="auth-keyphrase"
+              type="text"
+              name="auth[keyphrase]"
+              autocomplete="off"
+              spellcheck="false"
+              autocapitalize="characters"
+              placeholder={Messages.auth_keyphrase_placeholder()}
+              class="bp-input"
+            />
+          </div>
+
+          <div class="bp-btn-row">
+            <button type="submit" class="bp-btn bp-btn-primary">{Messages.auth_button_login()}</button>
+            <button type="submit" class="bp-btn bp-btn-default" formaction={~p"/auth/generate"}>
+              {Messages.auth_button_generate()}
+            </button>
+          </div>
+        </form>
+
+        <p class="bp-help">
+          {Messages.auth_login_help_body()}
+        </p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<PerpWalkWeb.Live.Helpers.app_footer health={@health} />

@@ -1,0 +1,439 @@
+/* ─────────────────────────────────────────────────────────────
+   PERP WALK product CSS. Blueprint owns the design system;
+   this file carries brand tokens + product-specific styles.
+   ───────────────────────────────────────────────────────────── */
+
+
+/* --- BRAND TOKENS ----------------------------------------------- */
+
+:root {
+  --bp-accent:         #ff6600;
+  --bp-accent-hover:   #ff8533;
+  --bp-accent-dim:     rgba(255, 102, 0, 0.12);
+  --bp-accent-overlay: rgba(255, 102, 0, 0.03);
+  --color-monero-grey:      #4c4c4c;
+  --color-monero-grey-tint: rgba(76, 76, 76, 0.4);
+
+  --table-row-height: 2.5rem;
+}
+
+
+/* --- LAYOUT ----------------------------------------------------- */
+
+/* Portfolio top row — MY MARKETS + MY DISPUTES side-by-side above
+ * the MY POSITIONS panel. Below tablet width, collapse the 2-col
+ * grid into direct children of the parent so all three panels
+ * stack with equal flex share instead of the 0.5/0.5/1 the wrapper
+ * produces at that width. */
+@media (max-width: 1024px) {
+  .bp-grid.cols-2.pw-portfolio-top { display: contents; }
+  .pw-portfolio-top > .bp-box { flex: 1; }
+}
+
+
+/* --- COMPONENTS ------------------------------------------------- */
+
+/* Market panel — chart pinned to a fixed height, criterion sits
+ * in the panel body with its own padding + separator. */
+.pw-market-panel { display: flex; flex-direction: column; }
+.pw-market-panel > .pw-odds-chart {
+  height: 280px;
+  flex: 0 0 280px;
+  display: flex; flex-direction: column;
+}
+.pw-market-panel > .pw-odds-chart > .pw-odds-chart-frame { flex: 1; min-height: 0; }
+.pw-market-panel > .pw-odds-chart > .pw-odds-chart-frame > .pw-odds-chart-svg { height: 100%; }
+
+.pw-market-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--color-border-faint);
+}
+.pw-market-title {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  flex: 1; min-width: 0;
+}
+.pw-market-chart-section { padding: 0.75rem; }
+.pw-market-criterion {
+  padding: 0.75rem;
+  border-top: 1px solid var(--color-border-faint);
+}
+.pw-market-criterion-text {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+.pw-market-criterion-label,
+.pw-market-chart-label {
+  font-size: var(--font-2xs);
+  letter-spacing: 0.06em;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 0 0 0.4rem 0;
+}
+
+/* Odds chart — single-series YES probability on a 0..1 Y-axis,
+ * time on X. Sentiment indicator, not precision tool. */
+.pw-odds-chart {
+  display: flex; flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+}
+.pw-odds-chart-frame { position: relative; width: 100%; }
+.pw-odds-chart-svg {
+  width: 100%; height: auto;
+  display: block;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Action panels (vote / trade / dispute) — lead paragraph on top,
+ * actions row on bottom. Children pad themselves so the buttons
+ * line up flush with the panel border. */
+.pw-vote-panel,
+.pw-dispute-panel,
+.pw-trade-panel { display: flex; flex-direction: column; }
+
+.pw-vote-panel > .bp-btn-row,
+.pw-dispute-panel > .bp-btn-row,
+.pw-trade-panel > .bp-btn-row,
+.pw-trade-panel > .pw-trade-positions { padding: 0.75rem; }
+
+/* Visible reason rendered below an action row when its buttons are
+ * disabled — replaces the unreachable `title=` tooltip pattern. */
+.pw-vote-panel > .pw-action-help,
+.pw-dispute-panel > .pw-action-help,
+.pw-trade-panel > .pw-action-help {
+  margin: 0;
+  padding: 0 0.75rem 0.75rem;
+  font-size: var(--font-2xs);
+  color: var(--color-text-dim);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Trade modal — countdown pill in the modal header. Tabular-nums
+ * so the M:SS digits don't reflow each second. */
+.pw-trade-modal-timer {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  padding: 0.15rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--font-2xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid currentColor;
+}
+
+/* Comments panel — Nostr-signed comment thread on /markets/:id. */
+.pw-comments-panel > .bp-panel-body { padding: 0; }
+.pw-comment-composer {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--color-border-faint);
+  display: flex; flex-direction: column;
+  gap: 0.5rem;
+}
+.pw-comment-footer { display: flex; align-items: center; justify-content: flex-end; }
+.pw-comment-list {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex; flex-direction: column;
+  max-height: 32rem;
+  overflow-y: auto;
+}
+.pw-comment {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--color-border-faint);
+  display: flex; flex-direction: column;
+  gap: 0.4rem;
+}
+.pw-comment:last-child { border-bottom: none; }
+.pw-comment-head {
+  display: flex; flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: var(--font-2xs);
+  letter-spacing: 0.06em;
+}
+.pw-comment-handle { color: var(--color-text); font-weight: 600; }
+/* Accent the handle for the viewer's own comments so they stand
+ * out in a long feed without having to read pubkeys. */
+.pw-comment-handle-self { color: var(--color-accent); }
+.pw-comment-pubkey {
+  color: var(--color-text-dim);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.pw-comment-time { margin-left: auto; color: var(--color-text-dim); }
+.pw-comment-body {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Claim confirm modal — key/value rows for amount + destination. */
+.pw-claim-confirm-row { display: flex; flex-direction: column; gap: 0.2rem; }
+.pw-claim-confirm-value {
+  font-size: var(--font-sm);
+  color: var(--color-text);
+  word-break: break-word;
+}
+.pw-claim-confirm-amount {
+  color: var(--color-accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.pw-claim-confirm-address {
+  font-family: var(--font-mono);
+  font-size: var(--font-xs);
+}
+
+/* Meta pair — inline pair of CATEGORY + STATE pills in a market row. */
+.pw-meta-pair { display: inline-flex; align-items: center; gap: 0.75rem; }
+
+/* Positions mini table — SIDE cell font styling in the compact
+ * "YOUR POSITIONS" table on the trade panel. */
+.pw-positions-mini-side { font-weight: 700; letter-spacing: 0.05em; }
+
+/* Create-market form — errors block above the action row. */
+.pw-create-errors {
+  display: flex; flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--color-monero-grey);
+  background: var(--color-monero-grey-tint);
+}
+.pw-create-error { margin: 0; font-size: var(--font-2xs); color: var(--color-text); }
+
+
+/* --- SEMANTIC MODIFIERS ----------------------------------------- */
+
+/* Single source of truth for data-table row height. */
+.bp-data-table tbody tr { height: var(--table-row-height); }
+
+/* YES / NO odds bar colouring. */
+.bp-bar-yes { background: var(--color-accent); }
+.bp-bar-no  { background: var(--color-monero-grey); }
+
+/* Muted pill — uses Monero grey (PW brand) instead of Blueprint neutral. */
+.bp-pill.muted {
+  color: var(--color-monero-grey);
+  border-color: var(--color-monero-grey);
+  background: var(--color-monero-grey-tint);
+}
+
+/* Back-link chrome (venue detail-page back button). */
+.bp-back a {
+  color: var(--color-text-dim);
+  text-decoration: none;
+  font-size: var(--font-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Lead paragraph — accent inline links. */
+.bp-lead a { color: var(--color-accent); text-decoration: none; }
+.bp-lead a:hover { text-decoration: underline; }
+
+/* Inline <code> inside help text. */
+.bp-help code {
+  background: var(--color-bg-secondary);
+  padding: 0.1rem 0.3rem;
+  border-radius: 2px;
+  font-size: 0.95em;
+}
+
+/* Row description cell — truncate with ellipsis on wide screens. */
+.bp-row-desc {
+  color: var(--color-text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  min-width: 0;
+}
+
+/* Empty cell placeholder — dimmed to signal "no data". */
+.bp-empty-cell { color: var(--color-text-dim); }
+
+/* Markets-row column emphasis — POOL is accent + weight 600 to
+ * pull the eye to TVL; TIME is dim + one step smaller so it
+ * recedes as secondary metadata. */
+.pw-markets-pool { color: var(--color-accent); font-weight: 600; }
+.pw-markets-time { color: var(--color-text-dim); font-size: var(--font-2xs); }
+
+/* Form field overrides — templates use bare .bp-label + .bp-input
+ * (not the .bp-field-label / .bp-input-row wrappers Blueprint
+ * expects), so replicate the stacked-vertical shape here: label
+ * on its own line with a small gap, then a full-width input. */
+.bp-field .bp-label {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.bp-field .bp-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  font-size: var(--font-sm);
+}
+.bp-field .bp-help { margin: 0.35rem 0 0; }
+.bp-field-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 6rem;
+  line-height: 1.5;
+}
+
+/* Deposit QR — always white background so wallet cameras can read
+ * the code against the dark venue theme. Faded state (deposit
+ * observed) desaturates so the QR still reads but no longer looks
+ * actionable. */
+.bp-modal-qr svg {
+  width: 220px; height: 220px;
+  background: white;
+  padding: 6px;
+  transition: opacity var(--transition), filter var(--transition);
+}
+.bp-modal-qr-faded svg { opacity: 0.25; filter: grayscale(1); }
+
+/* Stacked form inside a bp-stack body inherits vertical rhythm. */
+.bp-stack > form { display: flex; flex-direction: column; gap: 0.75rem; }
+
+/* Admin page grid — last row's boxes need flex to fill remaining
+ * vertical space so the dashboard's bottom tables don't collapse. */
+.bp-admin-page > .bp-grid:last-child > .bp-box {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Buy YES / Buy NO — variant classes for the trade + listing-vote
+ * buttons. Same role as .bp-btn-primary; set their own transparent
+ * rest background, filled on hover, filled when vote is cast. */
+.pw-buy-yes.bp-btn {
+  background: transparent;
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+.pw-buy-yes.bp-btn:hover:not(:disabled),
+.pw-buy-yes.pw-vote-cast.bp-btn {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+.pw-buy-no.bp-btn {
+  background: transparent;
+  color: var(--color-monero-grey);
+  border: 1px solid var(--color-monero-grey);
+}
+.pw-buy-no.bp-btn:hover:not(:disabled),
+.pw-buy-no.pw-vote-cast.bp-btn,
+.pw-dispute-cast.bp-btn {
+  background: var(--color-monero-grey);
+  color: var(--color-bg);
+}
+.pw-buy-side { font-size: var(--font-md); font-weight: 700; letter-spacing: 0.05em; }
+.pw-buy-cost {
+  font-size: var(--font-sm);
+  font-weight: 400;
+  opacity: 0.85;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.pw-resolve-btn.bp-btn { font-weight: 600; letter-spacing: 0.05em; }
+
+/* Trade modal — YES/NO tinting on the modal chrome. */
+.pw-trade-modal-yes .bp-panel-title { color: var(--color-accent);      border-left-color: var(--color-accent); }
+.pw-trade-modal-no  .bp-panel-title { color: var(--color-monero-grey); border-left-color: var(--color-monero-grey); }
+.pw-trade-modal-yes { border-color: var(--color-accent); }
+.pw-trade-modal-no  { border-color: var(--color-monero-grey); }
+.pw-trade-modal-timer-yes { color: var(--color-accent);      background: var(--color-accent-dim); }
+.pw-trade-modal-timer-no  { color: var(--color-monero-grey); background: var(--color-monero-grey-tint); }
+
+/* Trade stepper — form wrapping inside the +/- controls. */
+.pw-trade-stepper-controls > form { flex: 1; }
+
+/* Stats panel — vertical key/value list in the market-detail Stats
+ * panel. dt = uppercase dim label (left), dd = tabular value (right,
+ * accent for YES/POOL, grey for NO). Blueprint's bp-stat-row shape
+ * has a border-bottom + centre align that doesn't match PW's design;
+ * this is PW-specific. */
+.pw-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.75rem;
+  font-size: var(--font-xs);
+}
+.pw-stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+.pw-stats-row dt {
+  font-size: var(--font-2xs);
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.pw-stats-row dd {
+  margin: 0;
+  color: var(--color-text);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  word-break: break-word;
+}
+.pw-stats-yes  { color: var(--color-accent);      font-weight: 700; font-size: var(--font-sm); }
+.pw-stats-no   { color: var(--color-monero-grey); font-weight: 700; font-size: var(--font-sm); }
+.pw-stats-pool { color: var(--color-accent);      font-weight: 600; }
+
+/* Vote arrows + reputation display. */
+.pw-vote-summary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-2xs);
+}
+.pw-vote-up   { color: var(--color-accent);      font-weight: 600; }
+.pw-vote-down { color: var(--color-monero-grey); font-weight: 600; }
+.pw-rep       { color: var(--color-text-dim);    font-weight: 600; }
+
+
+/* --- ADMIN ------------------------------------------------------ */
+
+/* Panel-action link — hoverable, no underline. */
+a.pw-panel-action,
+a.pw-panel-action:visited,
+a.pw-panel-action:hover { cursor: pointer; text-decoration: none; }
+a.pw-panel-action:hover { color: var(--color-text-secondary); }
+
+/* Mini-table cell colours — replication telemetry (per-peer). */
+.bp-mini-table .pw-origin       { color: var(--color-accent);  font-weight: 600; }
+.bp-mini-table .pw-lag-ok       { color: var(--color-accent); }
+.bp-mini-table .pw-lag-warning  { color: var(--color-warning); }
+.bp-mini-table .pw-lag-critical { color: var(--color-loss);    font-weight: 600; }
+.bp-mini-table .pw-tick-stale   { color: var(--color-loss); }

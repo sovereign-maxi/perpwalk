@@ -1,0 +1,3 @@
+## Erlang distribution port is set via ERL_FLAGS in rel/env.sh.eex
+## (runtime env-var-driven, not templated here) so co-tenanted hosts
+## can override without a source-code change. EPMD uses 4369.

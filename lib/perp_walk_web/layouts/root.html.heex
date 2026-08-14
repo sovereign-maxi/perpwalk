@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title default="PERP WALK">{assigns[:page_title]}</.live_title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0iIzBhMGEwYSIvPgogIDxwYXRoIGQ9Ik0yMDIgMEg3N1Y3MzBIMzIwUTM5MyA3MzAgNDQ3LjUgNzAyUTUwMiA2NzQgNTMyIDYyMy41UTU2MiA1NzMgNTYyIDUwNVE1NjIgNDM3IDUzMiAzODYuNVE1MDIgMzM2IDQ0Ny41IDMwOFEzOTMgMjgwIDMyMCAyODBIMjAyVjBaTTIwMiA2MjBWMzkwSDMyMFEzNzMgMzkwIDQwNCA0MjJRNDM1IDQ1NCA0MzUgNTA1UTQzNSA1NTYgNDA0IDU4OFEzNzMgNjIwIDMyMCA2MjBIMjAyWiIgZmlsbD0iI2ZmNjYwMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOS40MCwyMy4wMCkgc2NhbGUoMC4wMjIwMCwtMC4wMjIwMCkiLz4KPC9zdmc+Cg==" />
+    <%!--
+      Preload the two JetBrains Mono weights that cover everything
+      above the fold: 400 (body baseline) and 600 (every button, badge,
+      label, and pill). Without preload, the browser only learns the
+      font URLs after CSS is fetched + parsed; over Tor that's a round
+      trip per font. `crossorigin` is required even on same-origin
+      preloads because CSS @font-face fetches in CORS mode — a mismatch
+      means the font is fetched twice. `font-display: swap` is already
+      set in blueprint.css so text renders in fallback while the
+      preload completes.
+    --%>
+    <link rel="preload" href="/fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/JetBrainsMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin />
+    <link phx-track-static rel="stylesheet" href="/assets/blueprint.css" />
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script phx-track-static defer src={~p"/assets/app.js"}></script>
+  </head>
+  <body>
+    <%!--
+      First-visit welcome / phishing-defense modal. Rendered
+      server-side only when the session has not yet been marked
+      welcomed. CONTINUE is a plain HTML form that POSTs to the
+      WelcomeController — no JavaScript required, works in Tor
+      Browser safest-mode where JS is disabled by default.
+    --%>
+    <div
+      :if={not PerpWalkWeb.WelcomeController.welcomed?(@conn)}
+      class="bp-modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="welcome-modal-title"
+    >
+      <div class="bp-box bp-modal-card">
+        <div class="bp-panel-header">
+          <h2 id="welcome-modal-title" class="bp-panel-title">
+            {PerpWalkWeb.Messages.modal_title_welcome()}
+          </h2>
+        </div>
+        <div class="bp-panel-body bp-stack">
+          <p class="bp-lead">{PerpWalkWeb.Messages.welcome_on_host_prefix()}</p>
+          <code class="bp-secret-block">{PerpWalkWeb.Endpoint.host()}</code>
+          <p class="bp-lead">{PerpWalkWeb.Messages.welcome_verify_instruction()}</p>
+          <p class="bp-lead">{PerpWalkWeb.Messages.welcome_description()}</p>
+          <form
+            method="post"
+            action={~p"/welcome/dismiss"}
+            class="bp-btn-row"
+          >
+            <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
+            <input type="hidden" name="redirect_to" value={@conn.request_path} />
+            <button type="submit" class="bp-btn bp-btn-primary">
+              {PerpWalkWeb.Messages.action_continue()}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    {@inner_content}
+  </body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title default="PERP WALK - ADMIN">{assigns[:page_title]}</.live_title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0iIzBhMGEwYSIvPgogIDxwYXRoIGQ9Ik0yMDIgMEg3N1Y3MzBIMzIwUTM5MyA3MzAgNDQ3LjUgNzAyUTUwMiA2NzQgNTMyIDYyMy41UTU2MiA1NzMgNTYyIDUwNVE1NjIgNDM3IDUzMiAzODYuNVE1MDIgMzM2IDQ0Ny41IDMwOFEzOTMgMjgwIDMyMCAyODBIMjAyVjBaTTIwMiA2MjBWMzkwSDMyMFEzNzMgMzkwIDQwNCA0MjJRNDM1IDQ1NCA0MzUgNTA1UTQzNSA1NTYgNDA0IDU4OFEzNzMgNjIwIDMyMCA2MjBIMjAyWiIgZmlsbD0iI2ZmNjYwMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOS40MCwyMy4wMCkgc2NhbGUoMC4wMjIwMCwtMC4wMjIwMCkiLz4KPC9zdmc+Cg==" />
+    <%!-- See PerpWalkWeb.Layouts.root — same preload rationale. --%>
+    <link rel="preload" href="/fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/JetBrainsMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin />
+    <link phx-track-static rel="stylesheet" href="/assets/blueprint.css" />
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script phx-track-static defer src={~p"/assets/app.js"}></script>
+  </head>
+  <body>
+    {@inner_content}
+  </body>
+</html>

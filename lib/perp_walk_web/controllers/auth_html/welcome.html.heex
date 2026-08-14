@@ -1,0 +1,28 @@
+<PerpWalkWeb.Live.Helpers.app_header current_handle={@current_handle} />
+
+<PerpWalkWeb.Live.Helpers.app_sub_nav current_handle={@current_handle} />
+
+<main class="bp-root">
+  <h1 class="bp-sr-only">{Messages.auth_welcome_sr_heading()}</h1>
+  <div class="bp-page bp-page-narrow">
+    <div class="bp-box">
+      <div class="bp-panel-header">
+        <h2 class="bp-panel-title">{Messages.auth_welcome_panel_title()}</h2>
+      </div>
+      <div class="bp-panel-body bp-stack">
+        <code class="bp-secret-block bp-secret-block-centered bp-secret-block-lg">{@display_key}</code>
+
+        <p class="bp-help">
+          {Messages.auth_welcome_help_handle_prefix()} <code class="bp-color-accent">@{@handle}</code> {Messages.auth_welcome_help_handle_suffix()}
+          {Messages.auth_welcome_help_save_lead()} <strong>{Messages.auth_welcome_help_save_emphasis()}</strong> {Messages.auth_welcome_help_save_tail()}
+        </p>
+
+        <form method="get" action={~p"/markets"}>
+          <button type="submit" class="bp-btn bp-btn-primary">{Messages.auth_welcome_continue_button()}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<PerpWalkWeb.Live.Helpers.app_footer health={@health} />

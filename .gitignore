@@ -1,0 +1,43 @@
+# Elixir
+/_build/
+/deps/
+/*.ez
+
+# Generated
+/cover/
+/doc/
+erl_crash.dump
+*.beam
+
+# Phoenix digest output (generated on deploy)
+/priv/static/assets/*.gz
+/priv/static/assets/*.br
+/priv/static/assets/*-*.js
+/priv/static/assets/*-*.css
+/priv/static/cache_manifest.json
+/priv/static/fonts/*-*.woff2
+/priv/static/favicon-*
+/priv/static/*.gz
+/priv/static/*.br
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.elixir_ls/
+.idea/
+.vscode/
+
+# Runtime data
+/data/
+/tmp/
+.scratch
+
+# Env
+.env
+*.pem
+*.key
+
+# Generated keys (secrets — deploy via Ansible, not git)
+/keys/
