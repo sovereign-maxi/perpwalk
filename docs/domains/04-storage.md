@@ -16,7 +16,7 @@ PERP WALK uses no traditional database. The state is the WAL plus the ETS rebuil
 |------|-----------|
 | **WAL** | Write-Ahead Log — append-only sequence of domain events that durably record every state change |
 | **Entry** | A single typed record in the WAL (market_created, position_opened, settlement_committed, etc.) |
-| **Seq** | Monotonic 64-bit counter, allocated centrally via `Storage.WAL.Sealer.seal/1` before append. Followers validate seq monotonicity over each replicated batch before any local WAL write |
+| **Seq** | Monotonic 64-bit counter, allocated centrally via `Storage.WAL.Sealer.seal/1` before append. Receiving nodes validate per-origin seq monotonicity over each replicated batch before any local WAL write — every node is an equal writer, so this is symmetric peer-to-peer validation, not a leader / follower check |
 | **Replay** | Reading the WAL on startup to reconstruct in-memory state |
 | **Snapshot** | A point-in-time export of state, used for fast restart and backup |
 | **DETS** | Disk-backed term storage used for orphan deposit records and reserves proof history |

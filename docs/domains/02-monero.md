@@ -41,8 +41,9 @@ PERP WALK uses **per-trade subaddresses** for every XMR movement: every Buy clic
 - Returns `{:ok, %{address: addr, address_index: idx}}`
 - Used by Markets services for every Quote, every dispute, every market creation deposit
 
-**Poller** — singleton GenServer
-- Polls `monero-wallet-rpc.get_transfers` at a configurable interval
+**Poller** — one GenServer per node
+- Polls `monero-wallet-rpc.get_transfers` at a configurable interval. Every guardian's Poller runs, so reorg detection and unconfirmed-drop detection happen everywhere.
+- Ledger-mutating dispatch (fills / confirmations / orphan writes) is gated on `Role.designated_processor?()` — only the designated processor writes; the other guardians publish local UI signals (e.g. `QuoteUnderpaid` for the modal transition) but skip the ledger call. The processor's writes reach the other guardians via bidirectional WAL replication, so two nodes never credit the same deposit.
 - For each confirmed transfer at the configured depth, resolves the destination subaddress via `lookup_subaddress/1` (O(1) via the `Markets.Store` subaddress secondary indexes) and dispatches:
   - `{:ok, {:quote, quote_id}}` → `Markets.Facade.fill_quote/2`. Overpayments are filled at the locked quote price and the overage is recorded as an `:overpayment` orphan for manual operator refund.
   - `{:ok, {:dispute, account_id, market_id}}` → `Markets.Facade.confirm_dispute_deposit/2`

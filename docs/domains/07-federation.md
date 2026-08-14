@@ -25,6 +25,7 @@ The threat the federation defends against: a single-server compromise that drain
 | **Rules engine** | Pure module that decides whether a Payout is auto-signable or requires operator review |
 | **Quorum** | Two of three signer nodes online and reachable. Without quorum, no payouts can be signed. |
 | **Cold operator** | The human operator. Holds no separate cryptographic key (signing requires server keys), but has SSH/admin access to all three nodes for review and override. |
+| **Designated processor** | The one guardian currently responsible for driving cluster-state-mutation tasks that must not double-fire: Monero deposit-credit ledger writes, the payout signing-loop, and the market lifecycle scheduler ticks. Defaults to node index 1 (`:p1` in prod, `:s1` in staging). The other guardians still observe the Monero chain (so reorgs are detected everywhere), replay lifecycle events from the WAL, and counter-sign FROST rounds when their share is requested — they simply do not drive the queues themselves. There is no election protocol: the assignment is inventory-default and can be moved at runtime by the operator via `Federation.Console.promote_processor/1`, which WAL-appends a `:processor_promotion` entry that replicates to every guardian so the cluster converges on the new set. Custody and signing are symmetric across all three regardless. |
 
 ## Architecture
 
@@ -55,9 +56,12 @@ The threat the federation defends against: a single-server compromise that drain
                               └─ Darks.Multisig
 ```
 
-All three nodes are equal participants — same components, same responsibilities. Every node holds a multisig key share, runs the Signer, orchestrates Monero RPC, and accepts local writes that replicate bidirectionally. The only asymmetry is which node currently hosts the `.onion` HiddenService keypair. OnionBalance across all three is a planned post-launch improvement.
+All three nodes hold identical code, identical config, and identical secrets — the app does not differentiate guardians at the storage or custody layer. Every node holds a multisig key share, runs a Signer GenServer, exposes Monero RPC via `Darks.Client`, and accepts local writes that replicate bidirectionally. Two asymmetries sit on top of this symmetric substrate:
 
-Three guardians, different operator aliases, different hosts, different jurisdictions (per the host-layout posture). **All three run identical code, identical config, and identical secrets** — the app does not differentiate guardians. Which guardian serves the public `.onion` is determined entirely by where the HiddenService key currently lives; the others are custody-only until routing points at them. Failover is manual (move the HiddenService keypair, publish the descriptor). OnionBalance across all three is a planned post-launch improvement. The federation signing responsibility is symmetric — any 2 of 3 guardians can complete a multisig round regardless of which is fronting.
+1. **Which node currently hosts the `.onion` HiddenService keypair.** Purely an external routing decision; the app itself doesn't know or care. OnionBalance across all three is a planned post-launch improvement.
+2. **Which node is the *designated processor*.** The designated processor is the sole driver of cluster-state-mutation tasks that must not double-fire (Monero deposit-credit ledger writes, payout signing-loop, market lifecycle scheduler ticks). Defaults to node index 1. All three guardians still hold FROST shares and counter-sign when their share is requested — signing quorum is symmetric — and the non-processor guardians still observe the chain, replay lifecycle events, and receive ledger mutations via WAL replication. They simply do not *drive* the queues themselves. Runtime override lands via `Federation.Console.promote_processor/1` as a WAL-appended `:processor_promotion` entry, so the cluster converges on the new designation without redeploy.
+
+Three guardians, different operator aliases, different hosts, different jurisdictions (per the host-layout posture). Failover of the public `.onion` is manual (move the HiddenService keypair, publish the descriptor). The federation signing responsibility is symmetric — any 2 of 3 guardians can complete a multisig round regardless of which is fronting or which is the designated processor.
 
 ## Aggregates
 
@@ -65,6 +69,7 @@ Three guardians, different operator aliases, different hosts, different jurisdic
 
 **`PerpWalk.Federation.Signer`** (one GenServer per node).
 - Subscribes to `Payout` events.
+- Only the **designated processor's** Signer advances the queue — its tick is gated by `Role.designated_processor?()` alongside `Guard.verified?()` and `Facade.quorum?()`. Non-processor guardians run the Signer process for supervision uniformity but their tick short-circuits without touching the queue; they participate in signing rounds only when the processor requests their FROST share via the multisig protocol.
 - Runs the `Rules` engine on each request.
 - Coordinates the Monero multisig protocol with peers via `Cartel.broadcast/2`.
 - When 2 of 3 signers agree, exchanges multisig info via `Darks.Multisig.export_info / import_info / sign / submit`.
@@ -87,6 +92,8 @@ Three guardians, different operator aliases, different hosts, different jurisdic
 - `rotate_keys/0` — re-runs the multisig setup ceremony
 - `income_status/0` — earned / drawn / withdrawable breakdown for federation revenue
 - `withdraw_federation_income/3` — enqueue a `:federation_income` Payout sweeping accumulated revenue
+- `current_processor/0` — show the currently-designated processor set on every reachable guardian (surfaces any cluster-wide divergence)
+- `promote_processor/1` — WAL-append a `:processor_promotion` entry moving the designated-processor role to another guardian (used when the default designated processor is down; the entry replicates so every guardian converges on the new set)
 
 **`PerpWalk.Federation.Signing.Peer.Policy`** (per-peer signing gate, pure module).
 - Evaluated BEFORE the peer signs an unsigned multisig tx proposed by a peer (the request originator is whichever guardian Cashier ran on; can be any of the three).

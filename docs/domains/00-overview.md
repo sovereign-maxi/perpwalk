@@ -12,6 +12,8 @@ XMR-only. **2-of-3 federation, all nodes equal.** Polymarket-style FPMM (Fixed P
 
 Three guardians run identical code, identical config, and identical secrets. Every Monero outflow requires 2-of-3 signatures via `Darks.Multisig` over the `cartel` federation runtime; the signing responsibility is symmetric across all three. **Which guardian serves the public onion is purely an external routing decision** — the public `.onion` HiddenService key currently lives on one guardian; OnionBalance across all three is the planned post-launch improvement. Promoting a different guardian is publishing the descriptor from its keys; nothing in the app code differentiates them. Failover is manual.
 
+One asymmetry sits on top of the symmetric storage + custody substrate: a single **designated processor** (defaults to node index 1) drives cluster-state-mutation tasks that must not double-fire — Monero deposit-credit ledger writes, the payout signing-loop, and the market lifecycle scheduler ticks. The other guardians still observe the chain, replay lifecycle events, counter-sign FROST rounds when their share is requested, and accept local writes; they simply don't drive the queues themselves. Runtime override lands via `Federation.Console.promote_processor/1` as a WAL-appended promotion entry that replicates so every guardian converges on the new designation. See the [Federation domain doc](07-federation.md) for the mechanics.
+
 ```
                                 Federation (2-of-3)
               ┌─────────────────────────┬──────────────────────────┐
