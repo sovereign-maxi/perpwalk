@@ -78,7 +78,7 @@ The user-facing markets surface is rendered LiveView, not a REST API.
 | Operation | Fee |
 |-----------|-----|
 | Deposit | Free |
-| Position | 3% spread (built into pricing) |
+| Position | 1.5% spread (built into pricing — one-sided, never balanced) |
 | Settlement | Free (spread already collected) |
 | Withdrawal | XMR network fee passed through to user |
 | Market creation | XMR escrow — returned on resolution; forfeited to federation revenue if community-rejected |
